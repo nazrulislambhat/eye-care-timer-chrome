@@ -1,0 +1,66 @@
+:root {
+  --ink: #12342f; --muted: #5b7a74; --bg: #eef7f4; --card: #ffffff;
+  --accent: #1f7a6d; --accent-ink: #ffffff; --line: #cfe3dd;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --ink: #e3f3ef; --muted: #8fb1a9; --bg: #0f1f1c; --card: #172a26; --accent: #4cc2ae; --accent-ink: #0b1a17; --line: #2a443e; }
+}
+* { box-sizing: border-box; }
+body { width: 330px; margin: 0; padding: 16px; background: var(--bg); color: var(--ink);
+  font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+h1 { font-size: 17px; margin: 0; font-weight: 650; }
+h2 { font-size: 13px; margin: 0 0 6px; font-weight: 600; color: var(--muted); }
+section { margin-bottom: 14px; }
+
+/* blinking eye */
+.eye-bg { fill: var(--accent); }
+.ball { transform-box: fill-box; transform-origin: center; animation: blink 4.5s infinite; }
+@keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 94% { transform: scaleY(0.08); } }
+@media (prefers-reduced-motion: reduce) { .ball { animation: none; } }
+
+.clock { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; text-align: center; }
+.ringwrap { position: relative; width: 140px; height: 140px; margin: 0 auto 8px; }
+.ringwrap svg { transform: rotate(-90deg); }
+.track { fill: none; stroke: var(--line); stroke-width: 8; }
+.arc { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round;
+  stroke-dasharray: 377; stroke-dashoffset: 377; transition: stroke-dashoffset .5s linear, stroke .3s; }
+.arc.warn { stroke: #d98e04; } .arc.urgent { stroke: #d64545; } .arc.paused { stroke: #7b8a87; }
+.center { position: absolute; inset: 0; display: grid; place-content: center; }
+#time { font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums; }
+#status { color: var(--muted); font-size: 12px; max-width: 100px; }
+.row { display: flex; gap: 8px; justify-content: center; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; border: 1px solid var(--line); background: var(--card); border-radius: 999px; overflow: hidden; }
+.chip button { border: 0; border-radius: 0; background: none; color: var(--ink); padding: 7px 12px; }
+.chip button.x { padding: 7px 9px 7px 0; color: var(--muted); }
+.chip button:hover { background: var(--line); }
+.hint { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
+
+.custom { display: flex; gap: 6px; }
+input[type=number] { flex: 1; min-width: 0; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); font: inherit; }
+button { font: inherit; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 8px 14px; cursor: pointer; }
+button[hidden] { display: none; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.toggles { display: grid; gap: 6px; color: var(--muted); font-size: 13px; }
+.toggles label { display: flex; gap: 8px; align-items: center; }
+footer { text-align: center; color: var(--muted); font-size: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+
+/* ---- parent PIN ---- */
+header h1 { flex: 1; }
+button.small { padding: 5px 10px; font-size: 12px; }
+body.locked .gated { display: none !important; }
+#lockView { display: grid; justify-items: center; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+#lockView[hidden] { display: none; }
+#lockPad { --pp-ink: var(--ink); --pp-bg: var(--bg); --pp-line: var(--line); --pp-accent: var(--accent); --pp-msg: #d64545; }
+.parent { display: grid; gap: 8px; }
+.parent .hint { margin: 0; }
+.tgl { display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.tgl input:disabled + * , .tgl:has(input:disabled) { opacity: .55; }
+
+.access { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; }
+.access .hint { margin: 2px 0 0; }
+.access button { white-space: nowrap; }

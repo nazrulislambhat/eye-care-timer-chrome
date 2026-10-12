@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Eye Care Timer</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <svg class="eye" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true">
+      <circle cx="32" cy="32" r="30" class="eye-bg"/>
+      <g class="ball">
+        <ellipse cx="32" cy="32" rx="20" ry="12" fill="#fff"/>
+        <circle cx="32" cy="32" r="7" fill="#12342f"/>
+        <circle cx="34.5" cy="29.5" r="2" fill="#fff"/>
+      </g>
+    </svg>
+    <h1>Eye break timer</h1>
+    <button id="relock" class="small" hidden>Lock</button>
+  </header>
+
+  <section class="clock" aria-live="polite">
+    <div class="ringwrap">
+      <svg viewBox="0 0 140 140" width="140" height="140" aria-hidden="true">
+        <circle cx="70" cy="70" r="60" class="track"/>
+        <circle cx="70" cy="70" r="60" class="arc" id="arc"/>
+      </svg>
+      <div class="center">
+        <div id="time">--:--</div>
+        <div id="status">No timer running</div>
+      </div>
+    </div>
+    <div class="row gated">
+      <button id="pause" hidden>Pause</button>
+      <button id="stop" hidden>Stop</button>
+    </div>
+  </section>
+
+  <section id="lockView" hidden>
+    <div id="lockPad"></div>
+  </section>
+
+  <section class="gated">
+    <h2>Quick start</h2>
+    <div id="chips" class="chips"></div>
+    <p class="hint">20 min follows the 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds.</p>
+  </section>
+
+  <section class="gated">
+    <h2>Your own time</h2>
+    <div class="custom">
+      <input id="custom" type="number" min="1" max="600" step="1" placeholder="Minutes" aria-label="Custom minutes">
+      <button id="startCustom" class="primary">Start</button>
+      <button id="saveCustom">Save</button>
+    </div>
+  </section>
+
+  <section class="gated parent">
+    <h2>Parent settings</h2>
+    <label class="tgl"><input type="checkbox" id="kidMode"> Bye-bye video screen at zero (kid mode)</label>
+    <label class="tgl"><input type="checkbox" id="closeBrowser"> Close the browser 10 seconds after the lock screen</label>
+    <div class="access">
+      <div><strong>Full protection:</strong> <span id="accessStatus">Off</span>
+        <p class="hint">Cover every tab and pause media at break time.</p></div>
+      <button id="openAccess">Set up</button>
+    </div>
+    <div class="custom">
+      <input id="pin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="New 4-digit PIN" aria-label="New 4-digit PIN" autocomplete="off">
+      <button id="savePin">Set PIN</button>
+    </div>
+    <p class="hint" id="pinHint"></p>
+  </section>
+
+  <section class="gated toggles">
+    <label><input type="checkbox" id="repeat"> Restart after each break</label>
+    <label><input type="checkbox" id="sound"> Play a chime</label>
+    <label><input type="checkbox" id="notify"> Show desktop notification</label>
+    <label><input type="checkbox" id="pauseMedia"> Pause playing media at break time</label>
+    <label><input type="checkbox" id="resumeMedia"> Resume media after the break</label>
+  </section>
+
+  <footer id="stats">Today: 0 breaks</footer>
+
+  <script src="icon.js"></script>
+  <script src="pinpad.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>

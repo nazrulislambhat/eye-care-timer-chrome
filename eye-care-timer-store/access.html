@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Full protection - Eye Care Timer</title>
+  <style>
+    :root { --ink:#12342f; --muted:#5b7a74; --bg:#eef7f4; --accent:#1f7a6d; --line:#cfe3dd; }
+    @media (prefers-color-scheme: dark) { :root { --ink:#e3f3ef; --muted:#8fb1a9; --bg:#0f1f1c; --accent:#4cc2ae; --line:#2a443e; } }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; background:var(--bg); color:var(--ink); font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; padding:24px; }
+    main { max-width:520px; }
+    h1 { font-size:26px; margin:0 0 10px; }
+    p { margin:0 0 14px; color:var(--muted); }
+    #status { color:var(--ink); font-weight:600; }
+    button { font:inherit; font-weight:600; padding:11px 22px; border-radius:10px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; }
+    button.primary { background:var(--accent); border-color:var(--accent); color:#fff; }
+    button[hidden] { display:none; }
+    button:focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Full protection</h1>
+    <p>With this on, the Bye-bye video screen covers <b>every open tab</b> and any playing video or audio is paused when the timer ends.</p>
+    <p>Chrome needs your permission to access all sites for that. Eye Care Timer never reads, stores or sends what is on your pages. It only draws its screen and pauses media.</p>
+    <p>Without it, the screen still opens in its own full-screen window and the browser still closes after the countdown.</p>
+    <p id="status" role="status"></p>
+    <button id="allow" class="primary">Allow access to all sites</button>
+    <button id="remove" hidden>Turn off and remove access</button>
+  </main>
+  <script src="access.js"></script>
+</body>
+</html>

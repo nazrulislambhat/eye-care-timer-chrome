@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Eye Care Timer",
+  "version": "4.1.0",
+  "description": "Break timer with a parent PIN. At zero it pauses media and locks the screen with a friendly kid message.",
+  "permissions": [
+    "alarms",
+    "storage",
+    "notifications",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Eye Care Timer",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "optional_host_permissions": [
+    "<all_urls>"
+  ]
+}
