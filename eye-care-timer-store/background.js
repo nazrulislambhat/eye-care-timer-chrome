@@ -4,6 +4,7 @@ importScripts("icon.js");
 
 const ALARM = "eyeTimer";
 const TICK = "eyeTick";
+const PREWARN = "eyePrewarn";
 const EXTEND_MINUTES = 10;
 const CLOSE_SECONDS = 10;
 let closeTimer = null;
@@ -189,8 +190,15 @@ async function startTimer(minutes, opts = {}) {
   const duration = Math.round(minutes * 60 * 1000);
   const endTime = Date.now() + duration;
   await chrome.alarms.clear(ALARM);
+  await chrome.alarms.clear(PREWARN);
   await chrome.alarms.create(ALARM, { when: endTime });
   await chrome.alarms.create(TICK, { periodInMinutes: 0.5 });
+
+  // Schedule pre-warning 2 minutes before the timer ends if duration is > 2 mins
+  if (minutes > 2) {
+    await chrome.alarms.create(PREWARN, { when: endTime - 2 * 60 * 1000 });
+  }
+
   const data = { endTime, duration, paused: false };
   if (opts.repeat !== undefined) data.repeat = !!opts.repeat;
   if (!opts.snooze) data.cycle = minutes;      // snooze must not change the repeat cycle
@@ -202,6 +210,7 @@ async function startTimer(minutes, opts = {}) {
 
 async function stopTimer() {
   await chrome.alarms.clear(ALARM);
+  await chrome.alarms.clear(PREWARN);
   await chrome.alarms.clear(TICK);
   await set({ paused: false, ringing: false, locked: false, closeAt: 0 });
   await chrome.storage.local.remove(["endTime", "duration", "pausedLeft"]);
@@ -212,6 +221,7 @@ async function pauseTimer() {
   const { endTime } = await get("endTime");
   if (!endTime) return;
   await chrome.alarms.clear(ALARM);
+  await chrome.alarms.clear(PREWARN);
   await set({ paused: true, pausedLeft: Math.max(1000, endTime - Date.now()) });
   await chrome.storage.local.remove("endTime");
   await refreshUI();
@@ -221,20 +231,52 @@ async function resumeTimer() {
   const { pausedLeft } = await get("pausedLeft");
   if (!pausedLeft) return;
   const endTime = Date.now() + pausedLeft;
+  await chrome.alarms.clear(ALARM);
+  await chrome.alarms.clear(PREWARN);
   await chrome.alarms.create(ALARM, { when: endTime });
   await chrome.alarms.create(TICK, { periodInMinutes: 0.5 });
+  if (pausedLeft > 120000) {
+    await chrome.alarms.create(PREWARN, { when: endTime - 2 * 60 * 1000 });
+  }
   await set({ endTime, paused: false });
   await chrome.storage.local.remove("pausedLeft");
   await refreshUI();
 }
 
+async function onPrewarn() {
+  const s = await get(["kidMode", "prewarn", "notify"]);
+  if (s.prewarn === false || s.notify === false) return;
+  const kid = s.kidMode !== false;
+  chrome.notifications.create("eyePrewarnNotice", {
+    type: "basic",
+    iconUrl: "icons/icon128.png",
+    title: kid ? "Screen time almost done ⏳" : "Eye break in 2 minutes 👀",
+    message: kid
+      ? "2 minutes left! Time to wrap up your video and get ready to play."
+      : "2 minutes left until your 20-20-20 eye break. Wrap up your current task!",
+    priority: 1
+  });
+}
+
 async function recordBreak() {
-  const { stats } = await get("stats");
-  const days = (stats && stats.days) || {};
+  const s = await get(["stats", "cycle"]);
+  const stats = s.stats || {};
+  const days = stats.days || {};
   days[today()] = (days[today()] || 0) + 1;
   const keys = Object.keys(days).sort();
-  while (keys.length > 60) delete days[keys.shift()];
-  await set({ stats: { days } });
+  while (keys.length > 90) delete days[keys.shift()];
+  
+  const totalBreaks = (stats.totalBreaks || 0) + 1;
+  const totalMinutes = (stats.totalMinutes || 0) + (s.cycle || 20);
+  await set({ stats: { ...stats, days, totalBreaks, totalMinutes } });
+}
+
+async function recordSnooze() {
+  const { stats } = await get("stats");
+  const s = stats || {};
+  const snoozes = s.snoozes || {};
+  snoozes[today()] = (snoozes[today()] || 0) + 1;
+  await set({ stats: { ...s, snoozes } });
 }
 
 // Parent entered the PIN on the lock screen.
@@ -252,7 +294,7 @@ async function unlock(pin, action) {
   return { ok: true };
 }
 
-async function onTimerDone() {
+async function onTimerDone(opts = {}) {
   const s = await get(null);
   const kid = s.kidMode !== false;   // the Bye-bye video screen is the default
   const message = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
@@ -279,13 +321,22 @@ async function onTimerDone() {
       scheduleClose();
     }
   } else {
-    await openFullscreen("reminder.html?m=" + encodeURIComponent(message) + "&sound=" + (s.sound !== false ? 1 : 0));
+    const soundParam = s.sound !== false ? 1 : 0;
+    const soundTypeParam = encodeURIComponent(s.soundType || "bowl");
+    const ambientParam = s.ambientSound ? 1 : 0;
+    const exerciseParam = encodeURIComponent(opts.exercise || s.preferredExercise || "rule");
+    await openFullscreen("reminder.html?m=" + encodeURIComponent(message) +
+      "&sound=" + soundParam +
+      "&soundType=" + soundTypeParam +
+      "&ambient=" + ambientParam +
+      "&exercise=" + exerciseParam);
   }
 
   if (s.repeat && s.cycle) {
     await startTimer(s.cycle, { keepRinging: true });
   } else {
     await chrome.alarms.clear(TICK);
+    await chrome.alarms.clear(PREWARN);
     await chrome.storage.local.remove(["endTime", "duration", "pausedLeft"]);
     await set({ paused: false });
   }
@@ -297,6 +348,19 @@ async function onTimerDone() {
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === ALARM) onTimerDone();
   else if (alarm.name === TICK) refreshUI();
+  else if (alarm.name === PREWARN) onPrewarn();
+});
+
+// ---------- keyboard commands ----------
+chrome.commands.onCommand.addListener(async (command) => {
+  if (command === "take-break") {
+    await onTimerDone();
+  } else if (command === "toggle-timer") {
+    const s = await get(["endTime", "paused"]);
+    if (s.paused) await resumeTimer();
+    else if (s.endTime) await pauseTimer();
+    else await startTimer(20);
+  }
 });
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
@@ -306,8 +370,9 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     case "stop":        reply(stopTimer().then(() => ({ ok: true }))); break;
     case "pause":       reply(pauseTimer().then(() => ({ ok: true }))); break;
     case "resume":      reply(resumeTimer().then(() => ({ ok: true }))); break;
-    case "snooze":      reply(startTimer(msg.minutes || 5, { snooze: true }).then(() => ({ ok: true }))); break;
+    case "snooze":      reply(recordSnooze().then(() => startTimer(msg.minutes || 5, { snooze: true })).then(() => ({ ok: true }))); break;
     case "taken":       reply(recordBreak().then(() => ({ ok: true }))); break;
+    case "launchBreak": reply(onTimerDone({ exercise: msg.exercise }).then(() => ({ ok: true }))); break;
     case "ack":         reply(set({ ringing: false }).then(refreshUI).then(() => ({ ok: true }))); break;
     case "resumeMedia": reply(resumeMedia().then(() => ({ ok: true }))); break;
     case "pinStatus":   reply(get("pinHash").then((s) => ({ set: !!s.pinHash }))); break;

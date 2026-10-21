@@ -2,8 +2,8 @@
 // Draws the live toolbar icon: a progress ring around an eye.
 
 const ICON_COLORS = {
-  idle: "#1f7a6d", running: "#1f7a6d", warn: "#d98e04",
-  urgent: "#d64545", paused: "#7b8a87", done: "#c1121f"
+  idle: "#10b981", running: "#10b981", warn: "#f59e0b",
+  urgent: "#ef4444", paused: "#64748b", done: "#10b981"
 };
 
 // Turns stored timer state into {state, progress} for the icon.
@@ -53,12 +53,12 @@ function drawIcon(size, { state = "idle", progress = 0, blink = false }) {
   g.fillStyle = "#ffffff";
   g.beginPath(); g.ellipse(cx, cx, ew, eh, 0, 0, Math.PI * 2); g.fill();
   if (!blink) {
-    g.fillStyle = "#12342f";
+    g.fillStyle = "#0f172a";
     g.beginPath(); g.arc(cx, cx, size * 0.115, 0, Math.PI * 2); g.fill();
   }
   return g.getImageData(0, 0, size, size);
 }
 
 function iconImageData(opts) {
-  return { 16: drawIcon(16, opts), 32: drawIcon(32, opts) };
+  return { 16: drawIcon(16, opts), 32: drawIcon(32, opts), 48: drawIcon(48, opts) };
 }

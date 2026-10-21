@@ -1,14 +1,30 @@
 {
   "manifest_version": 3,
   "name": "Eye Care Timer",
-  "version": "4.1.0",
-  "description": "Break timer with a parent PIN. At zero it pauses media and locks the screen with a friendly kid message.",
+  "version": "4.2.0",
+  "description": "Smart eye break timer and kid screen-time limiter with guided eye exercises, analytics, and parent PIN lock.",
   "permissions": [
     "alarms",
     "storage",
     "notifications",
     "scripting"
   ],
+  "commands": {
+    "take-break": {
+      "suggested_key": {
+        "default": "Alt+Shift+E",
+        "mac": "Alt+Shift+E"
+      },
+      "description": "Take an eye break now"
+    },
+    "toggle-timer": {
+      "suggested_key": {
+        "default": "Alt+Shift+P",
+        "mac": "Alt+Shift+P"
+      },
+      "description": "Pause or resume timer"
+    }
+  },
   "background": {
     "service_worker": "background.js"
   },

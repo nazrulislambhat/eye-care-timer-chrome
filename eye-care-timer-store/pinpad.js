@@ -1,16 +1,17 @@
 // Shared 4-digit keypad. Used by the popup, the lock overlay and the reminder window.
 const PINPAD_CSS = `
-.pp{display:grid;justify-items:center;gap:12px;color:var(--pp-ink,#12342f);font-family:inherit}
-.pp-title{font-weight:700;font-size:18px;text-align:center}
+.pp{display:grid;justify-items:center;gap:12px;color:var(--pp-ink,#0f172a);font-family:inherit}
+.pp-title{font-weight:750;font-size:17px;text-align:center;letter-spacing:-0.01em}
 .pp-dots{display:flex;gap:12px;height:20px;align-items:center}
-.pp-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--pp-accent,#1f7a6d);box-sizing:border-box}
-.pp-dot.on{background:var(--pp-accent,#1f7a6d)}
-.pp-grid{display:grid;grid-template-columns:repeat(3,64px);gap:10px}
-.pp-grid button,.pp-grid span{height:52px}
-.pp-grid button{font:inherit;font-size:20px;font-weight:600;border-radius:12px;border:1px solid var(--pp-line,#cfe3dd);background:var(--pp-bg,#fff);color:inherit;cursor:pointer;touch-action:manipulation}
-.pp-grid button:active{transform:scale(.96)}
-.pp-grid button:focus-visible{outline:2px solid var(--pp-accent,#1f7a6d);outline-offset:2px}
-.pp-msg{min-height:20px;font-size:14px;color:var(--pp-msg,#b42318);text-align:center}
+.pp-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--pp-accent,#10b981);box-sizing:border-box;transition:all .15s}
+.pp-dot.on{background:var(--pp-accent,#10b981);box-shadow:0 0 8px rgba(16,185,129,.4)}
+.pp-grid{display:grid;grid-template-columns:repeat(3,62px);gap:8px}
+.pp-grid button,.pp-grid span{height:48px}
+.pp-grid button{font:inherit;font-size:19px;font-weight:650;border-radius:12px;border:1px solid var(--pp-line,#e2e8f0);background:var(--pp-bg,#fff);color:inherit;cursor:pointer;touch-action:manipulation;transition:all .12s}
+.pp-grid button:hover{border-color:var(--pp-accent,#10b981);background:rgba(16,185,129,.05)}
+.pp-grid button:active{transform:scale(.95)}
+.pp-grid button:focus-visible{outline:2px solid var(--pp-accent,#10b981);outline-offset:2px}
+.pp-msg{min-height:20px;font-size:13px;font-weight:600;color:var(--pp-msg,#ef4444);text-align:center}
 .pp.shake{animation:ppshake .35s}
 @keyframes ppshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 @media (prefers-reduced-motion:reduce){.pp.shake{animation:none}}

@@ -11,27 +11,42 @@ When the timer reaches zero, it can show a friendly **"Bye-bye video! All done!"
 
 ## Features
 
-**Timer**
-- Quick-start presets (15, 20 and 30 minutes) plus any custom time, which you can save as your own preset
-- Keeps running while the browser is minimized (uses `chrome.alarms`, not a page timer)
-- Pause, resume and stop, with optional auto-restart after each break
-- Live toolbar icon: a progress ring around an eye that shrinks as time runs out, with colors for normal, under 5 minutes, under 1 minute, paused and break time. The badge shows the minutes left
-- Break and streak counter for the current day
+**Timer & Navigation**
+- Tabbed interface: **Timer**, **Exercises**, **Insights**, and **Settings**
+- Quick-start presets (15, 20 and 30 minutes) plus custom saved presets
+- Keeps running while the browser is minimized (uses `chrome.alarms`)
+- Live toolbar icon: progress ring around a blinking eye with state colors (normal emerald, under 5m amber, under 1m red, paused slate)
+- Keyboard shortcuts: `Alt+Shift+E` (Take break now), `Alt+Shift+P` (Pause/Resume)
+- 2-minute heads-up notification before break time
 
-**Kid mode ("Bye-bye video")**
-- Full-screen window with a waving sun, "Bye-bye video! All done!", a random play idea and a countdown ring
-- After 10 seconds it closes every tab, window and the browser
-- Parent PIN (4 digits, stored as a salted SHA-256 hash). It protects the popup, the settings and the unlock screen
-- Press-and-hold **Parent** button (1.5 s) so a toddler's tap does nothing, then enter the PIN to choose **10 more minutes** or **Close this screen**
-- Keyboard input is swallowed while locked
-- Wrong-PIN throttling: 5 wrong tries lock the keypad for 30 seconds
+**Guided Eye Exercises & Restorative Break Screen**
+- Deep, calming oceanic emerald palette designed for visual relaxation
+- 4 interactive pacer modes:
+  - **20-20-20 Rule**: classic 20-second distance gaze
+  - **Breathing Orb**: 4-2-4 rhythmic pulsing orb to ease tension
+  - **Infinity Tracker**: smooth pursuit figure-8 path for ocular muscle relief
+  - **Blink Gym**: 10 guided slow blinks to replenish natural tear film
+- Synthesized audio via Web Audio API: **Tibetan Singing Bowl**, **Zen Bell**, or **Classic Chime**
+- Synthesized ambient surf/rain soundscape toggle during breaks
 
-**Eye-health break (when kid mode is off)**
-- Full-screen break with tips, a 20-second "look 20 feet away" countdown, an optional chime, and Snooze or Done buttons
+**Kid Mode ("Bye-bye video")**
+- Day & Night themes:
+  - **Sunny Day**: cheerful sun, waving hand, rolling hills, play ideas
+  - **Sleepy Bedtime**: crescent moon, twinkling stars, bedtime ideas
+- Gentle 2-minute pre-warning to prevent sudden-cutoff tantrums
+- Offline speech synthesis prompt ("Bye-bye video! All done! Great job!")
+- Confetti celebration and countdown ring
+- 10-second automatic browser close
+- Parent PIN (4 digits, salted SHA-256 hash) with 1.5-second hold button and wrong-PIN lockout throttling
 
-**Full protection (optional)**
-- Covers every open tab with the Bye-bye video screen and pauses playing video and audio (and resumes it if you choose)
-- Needs access to all sites, which is requested only when you turn it on from the **Full protection** page. Without it, everything else still works
+**Insights & Habit Analytics**
+- 7-day visual consistency bar chart with daily break counts
+- Multi-day streak tracker and protected screen-time hours
+- Break compliance rate (taken vs snoozed)
+
+**Full Protection (optional)**
+- Covers every open tab and pauses/resumes playing video and audio across sites
+- Requires optional host permissions requested only upon opt-in
 
 ## Screenshots
 

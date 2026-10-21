@@ -2,91 +2,396 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Take care of your eyes</title>
+  <title>Eye Care Rest & Recovery</title>
   <style>
-    :root { --bg:#9b1018; --ink:#fff; --muted:#ffd6d6; --accent:#ffe3e3; --line:rgba(255,255,255,.14); }
+    :root {
+      --bg-dark: #061412;
+      --bg-radial: radial-gradient(circle at 50% 20%, #0d2822 0%, #051210 100%);
+      --ink: #f0fdf4;
+      --muted: #94a3b8;
+      --accent: #34d399;
+      --accent-glow: rgba(52, 211, 153, 0.35);
+      --card-bg: rgba(13, 40, 34, 0.55);
+      --card-border: rgba(52, 211, 153, 0.18);
+      --line: rgba(255, 255, 255, 0.12);
+    }
     * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body { margin: 0; background: var(--bg); color: var(--ink);
-      font: 18px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
-      display: flex; padding: 3vh 5vw; overflow: auto; }
-    main { width: 100%; max-width: 1040px; margin: auto; display: grid; gap: 2.2vh; justify-items: center; text-align: center; }
-    .hero svg.pulse { width: clamp(56px, 10vh, 92px); height: auto; }
+    html, body { height: 100%; margin: 0; }
+    body {
+      background: var(--bg-radial);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      padding: 2.5vh 4vw;
+      overflow-y: auto;
+    }
+    .top-bar {
+      width: 100%;
+      max-width: 1080px;
+      margin: 0 auto 1.5vh;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(52, 211, 153, 0.12);
+      border: 1px solid var(--card-border);
+      color: var(--accent);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .ambient-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 7px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all .2s;
+    }
+    .ambient-btn:hover { background: rgba(52, 211, 153, 0.2); border-color: var(--accent); }
+    .ambient-btn.active { background: var(--accent); color: #061412; font-weight: 600; }
 
-    .hero { display: grid; justify-items: center; gap: 12px; }
-    h1 { margin: 0; font-size: clamp(34px, 6vw, 68px); line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; }
-    #msg { margin: 0; max-width: 620px; color: var(--muted); font-size: clamp(17px, 2vw, 22px); }
+    main {
+      width: 100%;
+      max-width: 1080px;
+      margin: auto;
+      display: grid;
+      gap: 2.2vh;
+      justify-items: center;
+      text-align: center;
+    }
+    .hero { display: grid; justify-items: center; gap: 8px; }
+    .hero svg.pulse { width: clamp(48px, 8vh, 72px); height: auto; }
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.08;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 40%, #a7f3d0 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    #msg { margin: 0; max-width: 650px; color: var(--muted); font-size: clamp(16px, 1.8vw, 20px); }
 
-    .ringwrap { position: relative; width: clamp(120px, 19vh, 200px); aspect-ratio: 1; }
-    .ringwrap svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-    .track { fill: none; stroke: var(--line); stroke-width: 8; }
-    .arc { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 377; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear; }
-    .center { position: absolute; inset: 0; display: grid; place-content: center; }
-    #count { font-size: clamp(48px, 8vh, 72px); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
-    #sub { margin: 0; font-size: clamp(18px, 2.2vw, 24px); font-weight: 600; }
+    /* Exercise Selector Tabs */
+    .mode-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 6px 0;
+    }
+    .mode-tab {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      padding: 8px 18px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .mode-tab:hover { color: var(--ink); border-color: rgba(52, 211, 153, 0.4); }
+    .mode-tab.active {
+      background: rgba(52, 211, 153, 0.2);
+      border-color: var(--accent);
+      color: #a7f3d0;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
 
-    .tips { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; width: 100%; text-align: left; }
-    .tip { border: 1px solid var(--line); background: rgba(255,255,255,.05); border-radius: 14px; padding: 12px 16px; }
-    @media (max-height: 900px) { .fact { display: none; } }
-    .tip h2 { margin: 0 0 4px; font-size: 17px; color: var(--accent); }
-    .tip p { margin: 0; font-size: 15px; color: var(--ink); opacity: .9; }
-    .fact { margin: 0; color: var(--muted); font-size: 15px; max-width: 720px; }
+    /* Pacer Viewports */
+    .pacer-area {
+      position: relative;
+      width: clamp(220px, 32vh, 320px);
+      height: clamp(200px, 28vh, 260px);
+      display: grid;
+      place-items: center;
+      margin: 4px 0;
+    }
+    .pacer-view {
+      position: absolute;
+      inset: 0;
+      display: none;
+      place-items: center;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .pacer-view.active { display: flex; }
 
-    .row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
-    button { font: inherit; font-weight: 600; border-radius: 12px; padding: 12px 28px; cursor: pointer; border: 1px solid var(--line); background: transparent; color: var(--ink); }
-    button.primary { background: var(--accent); border-color: var(--accent); color: #5c0b0e; }
+    /* Mode 1: Ring */
+    .ringwrap { position: relative; width: clamp(140px, 22vh, 210px); aspect-ratio: 1; }
+    .ringwrap svg { width: 100%; height: 100%; transform: rotate(-90deg); filter: drop-shadow(0 0 10px var(--accent-glow)); }
+    .track { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 8; }
+    .arc {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 8;
+      stroke-linecap: round;
+      stroke-dasharray: 377;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+    .center-content { position: absolute; inset: 0; display: grid; place-content: center; }
+    #count { font-size: clamp(48px, 7vh, 68px); font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; }
+    .pacer-sub { margin-top: 10px; font-size: clamp(16px, 1.8vw, 20px); font-weight: 600; color: #a7f3d0; }
+
+    /* Mode 2: Breathing Orb */
+    .orb-wrap { position: relative; width: 160px; height: 160px; display: grid; place-items: center; }
+    .orb {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #6ee7b7 0%, #10b981 60%, rgba(16, 185, 129, 0.2) 100%);
+      box-shadow: 0 0 35px #10b981;
+      animation: breathe 10s infinite ease-in-out;
+    }
+    .orb-label { margin-top: 12px; font-size: 20px; font-weight: 700; color: #6ee7b7; min-height: 28px; }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); opacity: 0.7; }
+      40% { transform: scale(2.4); opacity: 1; }
+      60% { transform: scale(2.4); opacity: 1; }
+    }
+
+    /* Mode 3: Infinity Tracker */
+    .infinity-wrap { position: relative; width: 260px; height: 130px; }
+    .infinity-svg { width: 100%; height: 100%; overflow: visible; }
+    .track-path { fill: none; stroke: rgba(52, 211, 153, 0.2); stroke-width: 4; stroke-dasharray: 6 6; }
+    .follower-dot {
+      fill: #34d399;
+      filter: drop-shadow(0 0 10px #34d399);
+      animation: traceInf 6s infinite linear;
+    }
+    @keyframes traceInf {
+      0% { transform: translate(50px, 65px); }
+      25% { transform: translate(130px, 30px); }
+      50% { transform: translate(210px, 65px); }
+      75% { transform: translate(130px, 100px); }
+      100% { transform: translate(50px, 65px); }
+    }
+
+    /* Mode 4: Blink Gym */
+    .blink-orb {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(52, 211, 153, 0.15);
+      border: 2px solid var(--accent);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 0 24px var(--accent-glow);
+    }
+    .blink-counter { font-size: 22px; font-weight: 700; color: #a7f3d0; margin-top: 10px; }
+
+    /* Tips Grid */
+    .tips {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      width: 100%;
+      text-align: left;
+    }
+    .tip {
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 14px 18px;
+      transition: transform .2s ease, border-color .2s;
+    }
+    .tip:hover {
+      transform: translateY(-2px);
+      border-color: rgba(52, 211, 153, 0.4);
+    }
+    .tip h2 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 700;
+      color: #6ee7b7;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tip p { margin: 0; font-size: 14px; color: var(--ink); opacity: .88; line-height: 1.45; }
+
+    .fact { margin: 0; color: var(--muted); font-size: 14px; max-width: 680px; }
+
+    /* Action Buttons */
+    .row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 4px; }
+    button {
+      font: inherit;
+      font-weight: 650;
+      border-radius: 14px;
+      padding: 13px 32px;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ink);
+      transition: all .2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    button:hover { background: rgba(255, 255, 255, 0.15); transform: translateY(-1px); }
+    button.primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-color: #34d399;
+      color: #ffffff;
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+    }
+    button.primary:hover {
+      box-shadow: 0 6px 26px rgba(16, 185, 129, 0.6);
+      transform: translateY(-2px);
+    }
     button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
-    #gate { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.65); display: grid; place-items: center; z-index: 10; }
+    /* Gate */
+    #gate { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(10px); display: grid; place-items: center; z-index: 100; }
     #gate[hidden] { display: none; }
-    .gcard { background: #5c0b0e; border: 1px solid var(--line); border-radius: 18px; padding: 24px 28px; --pp-ink: #e8f6f2; --pp-bg: #3d070a; --pp-line: rgba(255,255,255,.2); --pp-accent: #ffe3e3; --pp-msg: #ff9b9b; }
+    .gcard {
+      background: #0d2822;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 26px 32px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.5);
+      --pp-ink: #f0fdf4;
+      --pp-bg: #061814;
+      --pp-line: rgba(52, 211, 153, 0.25);
+      --pp-accent: #34d399;
+      --pp-msg: #f87171;
+    }
+
     .ball { transform-box: fill-box; transform-origin: center; animation: blink 3.5s infinite; }
     .pulse { transform-box: fill-box; transform-origin: center; animation: pulse 2.6s ease-in-out infinite; }
     @keyframes blink { 0%, 88%, 100% { transform: scaleY(1); } 92% { transform: scaleY(0.08); } }
-    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-    @media (prefers-reduced-motion: reduce) { .ball, .pulse { animation: none; } .arc { transition: none; } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+    @media (prefers-reduced-motion: reduce) {
+      .ball, .pulse, .orb, .follower-dot { animation: none !important; }
+      .arc { transition: none !important; }
+    }
   </style>
 </head>
 <body>
+  <div class="top-bar">
+    <div class="badge">👀 Eye Care Mode</div>
+    <button id="ambientToggle" class="ambient-btn" type="button" aria-pressed="false">
+      <span id="ambientIcon">🌊</span> <span id="ambientLabel">Ambient Sound</span>
+    </button>
+  </div>
+
   <main>
     <section class="hero">
-      <svg class="pulse" viewBox="0 0 64 64" width="96" height="96" aria-hidden="true">
-        <circle cx="32" cy="32" r="30" fill="#5c0b0e"/>
+      <svg class="pulse" viewBox="0 0 64 64" width="72" height="72" aria-hidden="true">
+        <circle cx="32" cy="32" r="30" fill="#0d2822" stroke="rgba(52,211,153,0.3)" stroke-width="2"/>
         <g class="ball">
           <ellipse cx="32" cy="32" rx="20" ry="12" fill="#fff"/>
-          <circle cx="32" cy="32" r="7" fill="#12342f"/>
-          <circle cx="34.5" cy="29.5" r="2" fill="#fff"/>
+          <circle cx="32" cy="32" r="7" fill="#061814"/>
+          <circle cx="34.5" cy="29.5" r="2.2" fill="#34d399"/>
         </g>
       </svg>
-      <h1>Give your eyes a break</h1>
-      <p id="msg">Look away from the screen for a moment.</p>
+      <h1>Give your eyes a moment</h1>
+      <p id="msg">Release visual tension, blink softly, and shift your focus far away.</p>
     </section>
 
-    <section class="hero" aria-live="polite">
-      <div class="ringwrap">
-        <svg viewBox="0 0 150 150" aria-hidden="true">
-          <circle cx="75" cy="75" r="60" class="track"/>
-          <circle cx="75" cy="75" r="60" class="arc" id="arc"/>
-        </svg>
-        <div class="center"><div id="count">20</div></div>
+    <!-- Exercise switcher tabs -->
+    <div class="mode-tabs" role="tablist">
+      <button class="mode-tab active" data-mode="rule" role="tab" aria-selected="true">🔭 20-20-20 Rule</button>
+      <button class="mode-tab" data-mode="breathe" role="tab" aria-selected="false">🌬️ Breathing Orb</button>
+      <button class="mode-tab" data-mode="infinity" role="tab" aria-selected="false">♾️ Infinity Track</button>
+      <button class="mode-tab" data-mode="blink" role="tab" aria-selected="false">👁️ Blink Gym</button>
+    </div>
+
+    <!-- Pacer views -->
+    <div class="pacer-area">
+      <!-- Mode 1: 20-20-20 Ring -->
+      <div class="pacer-view active" id="view-rule" role="tabpanel">
+        <div class="ringwrap">
+          <svg viewBox="0 0 150 150" aria-hidden="true">
+            <circle cx="75" cy="75" r="60" class="track"/>
+            <circle cx="75" cy="75" r="60" class="arc" id="arc"/>
+          </svg>
+          <div class="center-content"><div id="count">20</div></div>
+        </div>
+        <p class="pacer-sub" id="sub">Look at something 20 feet (6m) away</p>
       </div>
-      <p id="sub">Look at something 20 feet away</p>
+
+      <!-- Mode 2: Breathing Orb -->
+      <div class="pacer-view" id="view-breathe" role="tabpanel">
+        <div class="orb-wrap">
+          <div class="orb"></div>
+        </div>
+        <div class="orb-label" id="orbLabel">Inhale gently...</div>
+        <p class="pacer-sub">Relax your shoulders and jaw</p>
+      </div>
+
+      <!-- Mode 3: Infinity Tracker -->
+      <div class="pacer-view" id="view-infinity" role="tabpanel">
+        <div class="infinity-wrap">
+          <svg class="infinity-svg" viewBox="0 0 260 130">
+            <path class="track-path" d="M 50,65 C 50,30 110,30 130,65 C 150,100 210,100 210,65 C 210,30 150,30 130,65 C 110,100 50,100 50,65 Z"/>
+            <circle class="follower-dot" r="10" cx="0" cy="0"/>
+          </svg>
+        </div>
+        <p class="pacer-sub">Track the smooth glowing dot with your eyes only</p>
+      </div>
+
+      <!-- Mode 4: Blink Gym -->
+      <div class="pacer-view" id="view-blink" role="tabpanel">
+        <div class="blink-orb">
+          <svg viewBox="0 0 64 64" width="56" height="56" aria-hidden="true">
+            <g class="ball">
+              <ellipse cx="32" cy="32" rx="20" ry="12" fill="#fff"/>
+              <circle cx="32" cy="32" r="7" fill="#061814"/>
+              <circle cx="34.5" cy="29.5" r="2.2" fill="#34d399"/>
+            </g>
+          </svg>
+        </div>
+        <div class="blink-counter" id="blinkPrompt">Blink softly...</div>
+        <p class="pacer-sub">Replenish your natural tear film</p>
+      </div>
+    </div>
+
+    <!-- Ergonomics & Health Cards -->
+    <section class="tips" aria-label="Eye wellness tips">
+      <div class="tip">
+        <h2>🔭 Focus in the distance</h2>
+        <p>Looking at a faraway object allows the ciliary muscles in your eyes to completely relax after close-up screen focus.</p>
+      </div>
+      <div class="tip">
+        <h2>💧 Complete blinks</h2>
+        <p>Screen use cuts blink frequency by 60%. Full, intentional blinks spread fresh moisture across your cornea.</p>
+      </div>
+      <div class="tip">
+        <h2>📏 Arm's length distance</h2>
+        <p>Position your monitor at arm's length (20–28 inches) with the top line of text level with your relaxed gaze.</p>
+      </div>
+      <div class="tip">
+        <h2>💧 Hydrate & stretch</h2>
+        <p>Take a sip of water, drop your shoulders away from your ears, and release neck tension while resting.</p>
+      </div>
     </section>
 
-    <section class="tips" aria-label="Eye health tips">
-      <div class="tip"><h2>Look far away</h2><p>Focus on something about 20 feet (6 m) away for 20 seconds, every 20 minutes.</p></div>
-      <div class="tip"><h2>Blink fully</h2><p>We blink less while staring at screens. Blink slowly 10 times to refresh your eyes.</p></div>
-      <div class="tip"><h2>Check your setup</h2><p>Keep the screen about an arm's length away, with the top at or just below eye level.</p></div>
-      <div class="tip"><h2>Move a little</h2><p>Take a sip of water and roll your neck and shoulders while you wait.</p></div>
-    </section>
-
-    <p class="fact">Long stretches of screen time can lead to dry, tired eyes and headaches. Short, regular breaks help.</p>
+    <p class="fact">Frequent 20-second breaks reduce computer vision syndrome, digital dry eye, and end-of-day fatigue.</p>
 
     <div class="row">
-      <button id="ok" class="primary">I'm done</button>
-      <button id="snooze">Snooze 5 min</button>
+      <button id="ok" class="primary" type="button">I'm done · Complete</button>
+      <button id="snooze" type="button">Snooze 5 min</button>
     </div>
   </main>
+
   <div id="gate" hidden></div>
   <script src="pinpad.js"></script>
   <script src="reminder.js"></script>

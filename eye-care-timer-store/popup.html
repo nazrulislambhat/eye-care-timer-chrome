@@ -7,79 +7,239 @@
 </head>
 <body>
   <header>
-    <svg class="eye" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true">
-      <circle cx="32" cy="32" r="30" class="eye-bg"/>
-      <g class="ball">
-        <ellipse cx="32" cy="32" rx="20" ry="12" fill="#fff"/>
-        <circle cx="32" cy="32" r="7" fill="#12342f"/>
-        <circle cx="34.5" cy="29.5" r="2" fill="#fff"/>
-      </g>
-    </svg>
-    <h1>Eye break timer</h1>
-    <button id="relock" class="small" hidden>Lock</button>
+    <div class="brand">
+      <svg class="eye-logo" viewBox="0 0 64 64" width="30" height="30" aria-hidden="true">
+        <circle cx="32" cy="32" r="30" class="eye-bg"/>
+        <g class="ball">
+          <ellipse cx="32" cy="32" rx="20" ry="12" fill="#fff"/>
+          <circle cx="32" cy="32" r="7" class="pupil"/>
+          <circle cx="34.5" cy="29.5" r="2.2" fill="#fff"/>
+        </g>
+      </svg>
+      <h1>Eye Care Timer</h1>
+    </div>
+    <button id="relock" class="small-btn" hidden title="Lock settings with PIN">🔒 Lock</button>
   </header>
 
-  <section class="clock" aria-live="polite">
-    <div class="ringwrap">
-      <svg viewBox="0 0 140 140" width="140" height="140" aria-hidden="true">
-        <circle cx="70" cy="70" r="60" class="track"/>
-        <circle cx="70" cy="70" r="60" class="arc" id="arc"/>
-      </svg>
-      <div class="center">
-        <div id="time">--:--</div>
-        <div id="status">No timer running</div>
-      </div>
-    </div>
-    <div class="row gated">
-      <button id="pause" hidden>Pause</button>
-      <button id="stop" hidden>Stop</button>
-    </div>
-  </section>
+  <!-- Segmented Tab Navigation -->
+  <nav class="tabs gated" role="tablist">
+    <button class="tab-btn active" data-tab="timer" role="tab" aria-selected="true">
+      <span class="icon">⏱️</span> Timer
+    </button>
+    <button class="tab-btn" data-tab="exercises" role="tab" aria-selected="false">
+      <span class="icon">👁️</span> Exercises
+    </button>
+    <button class="tab-btn" data-tab="insights" role="tab" aria-selected="false">
+      <span class="icon">📊</span> Insights
+    </button>
+    <button class="tab-btn" data-tab="settings" role="tab" aria-selected="false">
+      <span class="icon">⚙️</span> Settings
+    </button>
+  </nav>
 
+  <!-- PIN Lock View (replaces tabs when locked) -->
   <section id="lockView" hidden>
     <div id="lockPad"></div>
   </section>
 
-  <section class="gated">
-    <h2>Quick start</h2>
-    <div id="chips" class="chips"></div>
-    <p class="hint">20 min follows the 20-20-20 rule: every 20 minutes, look 20 feet away for 20 seconds.</p>
-  </section>
+  <!-- TAB 1: TIMER -->
+  <div id="tab-timer" class="tab-content active gated">
+    <section class="clock-card" aria-live="polite">
+      <div class="ringwrap">
+        <svg viewBox="0 0 150 150" width="144" height="144" aria-hidden="true">
+          <circle cx="75" cy="75" r="62" class="track"/>
+          <circle cx="75" cy="75" r="62" class="arc" id="arc"/>
+        </svg>
+        <div class="center-time">
+          <div id="time">--:--</div>
+          <div id="status" class="status-pill">Ready</div>
+        </div>
+      </div>
+      <div class="timer-controls">
+        <button id="pause" class="btn-ctrl" hidden>Pause</button>
+        <button id="stop" class="btn-ctrl" hidden>Stop</button>
+        <button id="breakNow" class="btn-ctrl accent-subtle">Take Break</button>
+      </div>
+    </section>
 
-  <section class="gated">
-    <h2>Your own time</h2>
-    <div class="custom">
-      <input id="custom" type="number" min="1" max="600" step="1" placeholder="Minutes" aria-label="Custom minutes">
-      <button id="startCustom" class="primary">Start</button>
-      <button id="saveCustom">Save</button>
+    <section class="section-card">
+      <h2>Quick Start</h2>
+      <div id="chips" class="chips"></div>
+      <p class="hint">Recommended: 20 min work & 20 sec eye rest (20-20-20 rule).</p>
+    </section>
+
+    <section class="section-card">
+      <h2>Custom Duration</h2>
+      <div class="custom-row">
+        <input id="custom" type="number" min="1" max="600" step="1" placeholder="Minutes" aria-label="Custom minutes">
+        <button id="startCustom" class="primary-btn">Start</button>
+        <button id="saveCustom" class="ghost-btn">+ Save</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- TAB 2: EXERCISES -->
+  <div id="tab-exercises" class="tab-content gated" hidden>
+    <div class="exercise-list">
+      <div class="exercise-item">
+        <div class="ex-icon">🔭</div>
+        <div class="ex-info">
+          <h3>20-20-20 Reset</h3>
+          <p>Look 20 feet away to relax eye ciliary muscles.</p>
+        </div>
+        <button class="small-action-btn" data-ex="rule">Start</button>
+      </div>
+
+      <div class="exercise-item">
+        <div class="ex-icon">🌬️</div>
+        <div class="ex-info">
+          <h3>Breathing Orb</h3>
+          <p>4-2-4 rhythm to de-stress eyes & calm mind.</p>
+        </div>
+        <button class="small-action-btn" data-ex="breathe">Start</button>
+      </div>
+
+      <div class="exercise-item">
+        <div class="ex-icon">♾️</div>
+        <div class="ex-info">
+          <h3>Infinity Tracker</h3>
+          <p>Smooth pursuit figure-8 to relieve ocular strain.</p>
+        </div>
+        <button class="small-action-btn" data-ex="infinity">Start</button>
+      </div>
+
+      <div class="exercise-item">
+        <div class="ex-icon">💧</div>
+        <div class="ex-info">
+          <h3>Blink Gym</h3>
+          <p>10 full, slow blinks to replenish tear film.</p>
+        </div>
+        <button class="small-action-btn" data-ex="blink">Start</button>
+      </div>
     </div>
-  </section>
-
-  <section class="gated parent">
-    <h2>Parent settings</h2>
-    <label class="tgl"><input type="checkbox" id="kidMode"> Bye-bye video screen at zero (kid mode)</label>
-    <label class="tgl"><input type="checkbox" id="closeBrowser"> Close the browser 10 seconds after the lock screen</label>
-    <div class="access">
-      <div><strong>Full protection:</strong> <span id="accessStatus">Off</span>
-        <p class="hint">Cover every tab and pause media at break time.</p></div>
-      <button id="openAccess">Set up</button>
+    <div class="tip-banner">
+      💡 <strong>Pro-tip:</strong> Performing eye exercises twice a day reduces digital eye strain by up to 70%.
     </div>
-    <div class="custom">
-      <input id="pin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="New 4-digit PIN" aria-label="New 4-digit PIN" autocomplete="off">
-      <button id="savePin">Set PIN</button>
+  </div>
+
+  <!-- TAB 3: INSIGHTS & ANALYTICS -->
+  <div id="tab-insights" class="tab-content gated" hidden>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-val" id="statToday">0</div>
+        <div class="stat-lbl">Breaks Today</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statStreak">0 d</div>
+        <div class="stat-lbl">Daily Streak</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statMinutes">0 m</div>
+        <div class="stat-lbl">Protected Time</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="statCompliance">100%</div>
+        <div class="stat-lbl">Compliance</div>
+      </div>
     </div>
-    <p class="hint" id="pinHint"></p>
-  </section>
 
-  <section class="gated toggles">
-    <label><input type="checkbox" id="repeat"> Restart after each break</label>
-    <label><input type="checkbox" id="sound"> Play a chime</label>
-    <label><input type="checkbox" id="notify"> Show desktop notification</label>
-    <label><input type="checkbox" id="pauseMedia"> Pause playing media at break time</label>
-    <label><input type="checkbox" id="resumeMedia"> Resume media after the break</label>
-  </section>
+    <section class="section-card chart-card">
+      <div class="chart-header">
+        <h2>Last 7 Days</h2>
+        <span class="chart-legend">Breaks taken</span>
+      </div>
+      <div class="bar-chart" id="barChart"></div>
+    </section>
+  </div>
 
-  <footer id="stats">Today: 0 breaks</footer>
+  <!-- TAB 4: SETTINGS -->
+  <div id="tab-settings" class="tab-content gated" hidden>
+    <section class="section-card">
+      <h2>Sound & Breaks</h2>
+      <div class="setting-row">
+        <span>Sound Theme</span>
+        <select id="soundType" class="select-input">
+          <option value="bowl">Tibetan Singing Bowl</option>
+          <option value="bell">Zen Bell</option>
+          <option value="chime">Classic Chime</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span>Play sound on break</span>
+        <label class="switch"><input type="checkbox" id="sound"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Ocean/Rain ambient audio</span>
+        <label class="switch"><input type="checkbox" id="ambientSound"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>2-min heads-up warning</span>
+        <label class="switch"><input type="checkbox" id="prewarn"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Desktop notification</span>
+        <label class="switch"><input type="checkbox" id="notify"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Auto-restart after break</span>
+        <label class="switch"><input type="checkbox" id="repeat"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Pause media at break</span>
+        <label class="switch"><input type="checkbox" id="pauseMedia"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Resume media after break</span>
+        <label class="switch"><input type="checkbox" id="resumeMedia"><span class="slider"></span></label>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>Kid Mode ("Bye-bye video")</h2>
+      <div class="setting-row">
+        <span>Kid screen lock at zero</span>
+        <label class="switch"><input type="checkbox" id="kidMode"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Lock Theme</span>
+        <select id="kidTheme" class="select-input">
+          <option value="day">☀️ Sunny Day</option>
+          <option value="night">🌙 Sleepy Bedtime</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span>Friendly voice speech</span>
+        <label class="switch"><input type="checkbox" id="kidSpeech"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Close browser after 10s</span>
+        <label class="switch"><input type="checkbox" id="closeBrowser"><span class="slider"></span></label>
+      </div>
+
+      <div class="access-box">
+        <div>
+          <strong>Full Protection:</strong> <span id="accessStatus" class="pill-badge">Off</span>
+          <p class="hint">Covers every open tab and pauses media.</p>
+        </div>
+        <button id="openAccess" class="ghost-btn">Configure</button>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h2>Parent PIN Protection</h2>
+      <div class="custom-row">
+        <input id="pin" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]*" placeholder="4-digit PIN" aria-label="New 4-digit PIN" autocomplete="off">
+        <button id="savePin" class="primary-btn">Set PIN</button>
+      </div>
+      <p class="hint" id="pinHint"></p>
+    </section>
+  </div>
+
+  <footer class="footer-bar">
+    <div class="hotkey-hint">
+      <kbd>Alt+Shift+E</kbd> Break · <kbd>Alt+Shift+P</kbd> Pause/Resume
+    </div>
+  </footer>
 
   <script src="icon.js"></script>
   <script src="pinpad.js"></script>
