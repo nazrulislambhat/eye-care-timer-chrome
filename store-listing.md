@@ -10,6 +10,7 @@ Remind the user to take screen breaks: a countdown timer that, when it ends, pau
 - **alarms**: runs the countdown so the break fires on time even when the browser is minimized.
 - **storage**: saves settings, timer state, custom minutes, the parent PIN (as a salted hash) and daily break counts on the device only.
 - **notifications**: shows a desktop notification when the timer ends.
+- **idle**: detects when the computer is locked or the user steps away from their desk to automatically pause and refresh the timer.
 - **scripting**: used only after the user opts in to "Full protection", to pause playing video and audio and to draw the break/lock screen over open tabs.
 - **optional host permission (all URLs)**: NOT requested at install. It is requested only when the user clicks "Allow access to all sites" on the Full protection page. Without it, the lock screen opens in its own full-screen window and nothing on web pages is touched. The extension never reads, stores or sends page content.
 

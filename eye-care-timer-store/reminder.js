@@ -4,13 +4,45 @@ if (msg) document.getElementById("msg").textContent = msg;
 const soundOn = params.get("sound") !== "0";
 const soundType = params.get("soundType") || "bowl";
 let ambientOn = params.get("ambient") === "1";
+let voiceOn = params.get("voice") === "1";
 const initialExercise = params.get("exercise") || "rule";
+let currentExerciseMode = initialExercise;
 
 const LOOK_SECONDS = 20;
 const CIRC = 377;
 let left = LOOK_SECONDS;
 let counted = false;
 const send = (m) => chrome.runtime.sendMessage(m);
+
+// ---------- Voice Guidance (Speech Synthesis) ----------
+function speak(text) {
+  if (!voiceOn || !window.speechSynthesis) return;
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.92;
+    u.pitch = 1.0;
+    u.volume = 0.75;
+    window.speechSynthesis.speak(u);
+  } catch (e) {}
+}
+
+const voiceBtn = document.getElementById("voiceToggle");
+function updateVoiceUI() {
+  if (!voiceBtn) return;
+  voiceBtn.classList.toggle("active", voiceOn);
+  voiceBtn.setAttribute("aria-pressed", voiceOn ? "true" : "false");
+  document.getElementById("voiceLabel").textContent = voiceOn ? "Voice Coach: On" : "Voice Coach: Off";
+}
+if (voiceBtn) {
+  voiceBtn.onclick = () => {
+    voiceOn = !voiceOn;
+    updateVoiceUI();
+    chrome.storage.local.set({ voiceGuidance: voiceOn });
+    if (voiceOn) speak("Voice coach active. Relax and follow along.");
+  };
+  updateVoiceUI();
+}
 
 // ---------- Sound Synthesis (Web Audio API) ----------
 let audioCtx = null;
@@ -185,6 +217,7 @@ const tick = setInterval(() => {
     document.getElementById("sub").textContent = "Rest complete! Your eyes thank you.";
     markTaken();
     playSound(soundType);
+    speak("Break complete! Great job resting your eyes.");
   }
 }, 1000);
 
@@ -192,7 +225,83 @@ const tick = setInterval(() => {
 const tabs = document.querySelectorAll(".mode-tab");
 const views = document.querySelectorAll(".pacer-view");
 
+// Macro Desk & Posture Steps
+const MACRO_STEPS = [
+  {
+    icon: "🧘",
+    title: "Neck & Upper Trap Release",
+    desc: "Tilt left ear gently to left shoulder, hold 5s, breathe deep, then tilt right. Release built-up neck stiffness.",
+    spoken: "Tilt your head gently to the left, then to the right to release tension."
+  },
+  {
+    icon: "🙆",
+    title: "Shoulder Roll & Chest Opener",
+    desc: "Roll shoulders backwards 5 times. Interlace fingers behind your back and gently open your chest.",
+    spoken: "Roll your shoulders back and gently open your chest."
+  },
+  {
+    icon: "✋",
+    title: "Wrist & Forearm Extension",
+    desc: "Extend your right arm forward, gently pull fingers backward with left hand for 5s. Repeat on left wrist.",
+    spoken: "Gently stretch your wrists and forearms to prevent strain."
+  },
+  {
+    icon: "💧",
+    title: "Hydration & Horizon Gaze",
+    desc: "Drink a sip of fresh water. Look out the window at the furthest cloud or horizon you can spot.",
+    spoken: "Take a sip of fresh water, and gaze far into the distance."
+  }
+];
+
+let macroIndex = 0;
+let macroProgress = 0;
+
+function renderMacroStep() {
+  const step = MACRO_STEPS[macroIndex];
+  const badge = document.getElementById("macroStepBadge");
+  const icon = document.getElementById("macroIcon");
+  const title = document.getElementById("macroTitle");
+  const desc = document.getElementById("macroDesc");
+  const fill = document.getElementById("macroTimerFill");
+  if (badge) badge.textContent = `Step ${macroIndex + 1} of ${MACRO_STEPS.length}`;
+  if (icon) icon.textContent = step.icon;
+  if (title) title.textContent = step.title;
+  if (desc) desc.textContent = step.desc;
+  if (fill) fill.style.width = "0%";
+  macroProgress = 0;
+  if (currentExerciseMode === "macro") speak(step.spoken);
+}
+
+const macroNextBtn = document.getElementById("macroNext");
+const macroPrevBtn = document.getElementById("macroPrev");
+if (macroNextBtn) {
+  macroNextBtn.onclick = () => {
+    macroIndex = (macroIndex + 1) % MACRO_STEPS.length;
+    renderMacroStep();
+  };
+}
+if (macroPrevBtn) {
+  macroPrevBtn.onclick = () => {
+    macroIndex = (macroIndex - 1 + MACRO_STEPS.length) % MACRO_STEPS.length;
+    renderMacroStep();
+  };
+}
+
+// Auto-advance macro step timer
+setInterval(() => {
+  if (currentExerciseMode !== "macro") return;
+  macroProgress += 2;
+  const fill = document.getElementById("macroTimerFill");
+  if (fill) fill.style.width = Math.min(100, macroProgress) + "%";
+  if (macroProgress >= 100) {
+    macroProgress = 0;
+    macroIndex = (macroIndex + 1) % MACRO_STEPS.length;
+    renderMacroStep();
+  }
+}, 120);
+
 function setExerciseMode(mode) {
+  currentExerciseMode = mode;
   tabs.forEach((t) => {
     const isTarget = t.dataset.mode === mode;
     t.classList.toggle("active", isTarget);
@@ -201,6 +310,17 @@ function setExerciseMode(mode) {
   views.forEach((v) => {
     v.classList.toggle("active", v.id === "view-" + mode);
   });
+  if (mode === "macro") {
+    renderMacroStep();
+  } else if (mode === "breathe") {
+    speak("Follow the breathing orb. Inhale and exhale smoothly.");
+  } else if (mode === "infinity") {
+    speak("Track the infinity shape with your eyes only.");
+  } else if (mode === "blink") {
+    speak("Perform slow, intentional blinks.");
+  } else if (mode === "rule") {
+    speak("Look twenty feet away for twenty seconds.");
+  }
 }
 
 tabs.forEach((tab) => {

@@ -7,7 +7,8 @@
     "alarms",
     "storage",
     "notifications",
-    "scripting"
+    "scripting",
+    "idle"
   ],
   "commands": {
     "take-break": {

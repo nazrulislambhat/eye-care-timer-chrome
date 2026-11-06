@@ -11,9 +11,13 @@ When the timer reaches zero, it can show a friendly **"Bye-bye video! All done!"
 
 ## Features
 
-**Timer & Navigation**
+**Smart Timer & Ergonomics**
 - Tabbed interface: **Timer**, **Exercises**, **Insights**, and **Settings**
 - Quick-start presets (15, 20 and 30 minutes) plus custom saved presets
+- **Smart Idle & Auto-Pause (`chrome.idle`)**: pauses when you leave your desk; auto-resets after a 10-minute natural break away from the screen
+- **Meeting & Presentation Shield**: detects active calls on Google Meet, Zoom, Teams, Webex and defers breaks by 5 minutes without disrupting you
+- **Break Delivery Options**: choose between **Immersive Fullscreen** or an unobtrusive **Gentle Floating HUD** banner
+- **Screen Warmer (Blue Light Tint)**: injects customizable warm amber tint directly in tabs to relieve evening eye strain
 - Keeps running while the browser is minimized (uses `chrome.alarms`)
 - Live toolbar icon: progress ring around a blinking eye with state colors (normal emerald, under 5m amber, under 1m red, paused slate)
 - Keyboard shortcuts: `Alt+Shift+E` (Take break now), `Alt+Shift+P` (Pause/Resume)
@@ -21,11 +25,13 @@ When the timer reaches zero, it can show a friendly **"Bye-bye video! All done!"
 
 **Guided Eye Exercises & Restorative Break Screen**
 - Deep, calming oceanic emerald palette designed for visual relaxation
-- 4 interactive pacer modes:
+- 5 interactive pacer modes:
   - **20-20-20 Rule**: classic 20-second distance gaze
   - **Breathing Orb**: 4-2-4 rhythmic pulsing orb to ease tension
   - **Infinity Tracker**: smooth pursuit figure-8 path for ocular muscle relief
   - **Blink Gym**: 10 guided slow blinks to replenish natural tear film
+  - **Desk & Posture Reset**: guided 4-step stretches for neck, shoulders, wrists, and hydration
+- **Spoken Voice Guidance Coach**: gentle audio cues for exercises and rest transitions
 - Synthesized audio via Web Audio API: **Tibetan Singing Bowl**, **Zen Bell**, or **Classic Chime**
 - Synthesized ambient surf/rain soundscape toggle during breaks
 
@@ -33,19 +39,23 @@ When the timer reaches zero, it can show a friendly **"Bye-bye video! All done!"
 - Day & Night themes:
   - **Sunny Day**: cheerful sun, waving hand, rolling hills, play ideas
   - **Sleepy Bedtime**: crescent moon, twinkling stars, bedtime ideas
-- Gentle 2-minute pre-warning to prevent sudden-cutoff tantrums
+- **Daily Screen-Time Budget**: enforce a daily allowance (e.g., 30m, 45m, 60m) tracked automatically
+- **Bedtime Curfew Lock**: automatically locks during scheduled sleep hours (e.g., 20:00 to 07:00)
+- **Gentle Volume Fade**: lowers video volume smoothly during the 2-minute pre-warning to prevent sudden-cutoff tantrums
 - Offline speech synthesis prompt ("Bye-bye video! All done! Great job!")
 - Confetti celebration and countdown ring
 - 10-second automatic browser close
 - Parent PIN (4 digits, salted SHA-256 hash) with 1.5-second hold button and wrong-PIN lockout throttling
 
 **Insights & Habit Analytics**
+- **Eye Health Score (0–100)**: holistic rating evaluating break frequency, streak consistency, and compliance
 - 7-day visual consistency bar chart with daily break counts
 - Multi-day streak tracker and protected screen-time hours
 - Break compliance rate (taken vs snoozed)
+- **Export & Reset**: export habit data to JSON for backup or optometrist review, and reset history anytime
 
 **Full Protection (optional)**
-- Covers every open tab and pauses/resumes playing video and audio across sites
+- Covers every open tab, pauses playing media, and powers the in-browser Screen Warmer and Gentle Volume Fade
 - Requires optional host permissions requested only upon opt-in
 
 ## Screenshots
@@ -75,9 +85,10 @@ To get your toddler's browser into kid mode: open the popup, set a parent PIN un
 | Permission | Why |
 | --- | --- |
 | `alarms` | Runs the countdown so it fires while the browser is minimized |
-| `storage` | Saves settings, timer state, presets, PIN hash and break counts locally |
-| `notifications` | Shows a desktop notification when the timer ends |
-| `scripting` | Used only after you opt in to Full protection, to pause media and draw the lock screen over open tabs |
+| `storage` | Saves settings, timer state, presets, PIN hash, and analytics locally |
+| `notifications` | Shows a desktop notification when the timer ends or pre-warns |
+| `idle` | Detects when you step away from the desk to auto-pause and auto-reset the timer |
+| `scripting` | Used to pause media, apply the Screen Warmer tint, and display break HUDs over open tabs |
 | `optional_host_permissions` (`<all_urls>`) | Not requested at install. Requested only when you click **Allow access to all sites** on the Full protection page |
 
 ## Privacy
@@ -88,15 +99,17 @@ Nothing leaves your device. The extension makes no network requests and uses no 
 
 ```
 manifest.json      Extension manifest (MV3)
-background.js      Service worker: timer, alarms, PIN checks, lock/close logic, media control
+background.js      Service worker: timer, idle detection, alarms, PIN checks, lock/close logic, media control
 icon.js            Draws the live toolbar icon (OffscreenCanvas)
-popup.html/css/js  Popup UI, PIN lock, settings
+popup.html/css/js  Popup UI, PIN lock, analytics, and settings
 pinpad.js          Shared 4-digit keypad
 kidscreen.js       "Bye-bye video" screen and 10-second countdown
 lock.html          Full-screen window that hosts the kid screen
 lock-page.js       Wires the lock window to storage and the close countdown
 lock-content.js    Page overlay (registered only when Full protection is on)
-reminder.html/js   Full-screen eye-health break
+gentle-banner.js   Non-intrusive floating HUD for Gentle Mode breaks
+screen-warmer.js   In-browser warm amber blue light filter layer
+reminder.html/js   Full-screen eye-health break, pacer exercises & voice coach
 access.html/js     Page that requests or removes all-sites access
 icons/             16, 48 and 128 px icons
 ```
