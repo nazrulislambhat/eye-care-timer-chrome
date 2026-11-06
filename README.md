@@ -74,11 +74,47 @@ When the timer reaches zero, it can show a friendly **"Bye-bye video! All done!"
 
 To get your toddler's browser into kid mode: open the popup, set a parent PIN under **Parent settings**, then start a timer.
 
-## Usage
+## Usage & Configuration Guide
 
-1. Click the toolbar icon and pick a preset or enter your own minutes.
-2. Optional: set a PIN, and decide whether to close the browser after the lock screen.
-3. When the timer ends, the break screen appears. Parents can hold **Parent**, enter the PIN and give 10 more minutes.
+### ⏱️ Setting Up Your Focus Cadence
+1. Click the Eye Care Timer toolbar icon.
+2. Choose a quick preset (**15m**, **20m**, **30m**) or input a custom interval and click **Start** (or **+ Save** to add it to your chips).
+3. The live toolbar icon reflects your remaining time with a circular progress ring and state colors (emerald $\to$ amber under 5m $\to$ red under 1m $\to$ slate when paused).
+
+### 🧘 Exercise Pacer Modes
+Switch between 5 scientifically backed recovery routines in the **Exercises** tab or on the break screen:
+- **🔭 20-20-20 Rule**: Relax ciliary muscles by shifting focus to an object 20 feet away for 20 seconds.
+- **🌬️ Breathing Orb**: 4-2-4 respiratory pacer (inhale 4s, hold 2s, exhale 4s) to calm heart rate and facial tension.
+- **♾️ Infinity Tracker**: Smooth pursuit visual tracker following a continuous figure-8 path to release ocular tension.
+- **💧 Blink Gym**: 10 guided slow, deliberate blinks to refresh and restore your natural tear film.
+- **🧘 Desk & Posture Reset**: Guided 4-step physical reset covering lateral neck releases, shoulder & chest openers, wrist extensions, and hydration.
+- **🗣️ Voice Coach**: Spoken cues via the Web Speech API can guide you hands-free through each exercise.
+
+### 🛡️ Smart Focus & Ergonomics Settings
+- **Smart Idle Auto-Pause (`chrome.idle`)**: The timer pauses automatically when you lock your screen or walk away from your desk.
+- **Natural Break Auto-Reset**: When enabled, spending $\ge 10$ minutes away from your screen is automatically recognized as a completed natural break, refreshing the timer cycle for your return.
+- **Meeting & Presentation Shield**: Detects active video calls and screen shares on Google Meet, Zoom, Microsoft Teams, Webex, and others, postponing eye breaks by 5 minutes to prevent awkward interruptions.
+- **Break Delivery**: Toggle between **Immersive Fullscreen** (deep visual disconnect) and **Gentle Floating HUD** (unobtrusive 20s pill at top of screen that never steals typing focus).
+- **Screen Warmer (Blue Light Filter)**: Injects an amber color tint with adjustable warmth (15% to 60%) to relieve late-night digital eye strain.
+- **Audio Themes**: Synthesized on-the-fly using the Web Audio API (**Tibetan Singing Bowl**, **Zen Bell**, or **Classic Chime**) plus an optional procedural surf/rain ambient generator.
+
+### 🧸 Kid Mode ("Bye-bye video") & Parental Controls
+1. Turn on **Kid screen lock at zero** and select a theme (**☀️ Sunny Day** or **🌙 Sleepy Bedtime**).
+2. Set a 4-digit **Parent PIN** (salted SHA-256 hash).
+3. **Daily Allowance Budget**: Set a total daily screen-time limit (e.g. 45 min/day). A progress meter in the popup tracks usage, and locks the browser when the quota is reached.
+4. **Bedtime Curfew**: Define sleep hours (e.g. 20:00 to 07:00). During curfew, the extension forces bedtime mode and blocks video playback without the parent PIN.
+5. **Gentle Volume Fade**: Tab video/audio volume gradually ramps down to 25% during the 2-minute pre-warning, gently preparing toddlers for screen shutoff.
+6. **Browser Close Countdown**: Optional 10-second countdown after timer expiration that closes all tabs and browser windows.
+
+---
+
+## Technical Highlights (Manifest V3)
+
+- **100% Offline & Private**: Zero network calls, zero tracking analytics, zero telemetry. All state, PIN hashes, and analytics live in `chrome.storage.local`.
+- **Pure Web Audio Synthesizer**: No external audio files or MP3s to load; chimes and ambient pink noise are synthesized directly in code.
+- **OffscreenCanvas Toolbar Rendering**: Renders real-time animated eye states and progress rings onto Chrome's extension action icon.
+- **Shadow DOM Isolation**: Both the Full Protection overlay and the Gentle Mode HUD banner use isolated shadow roots to prevent host page CSS collisions.
+- **Hardware-Resilient Countdown**: Driven by timestamps stored in local storage and backed by `chrome.alarms`, allowing the timer to survive service worker deactivations and browser minimization.
 
 ## Permissions
 
