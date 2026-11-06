@@ -139,23 +139,50 @@ function renderKidScreen(root, opts = {}) {
   }
 
   // Theme & Voice handling
-  chrome.storage.local.get(["kidTheme", "kidSpeech"]).then(({ kidTheme, kidSpeech }) => {
-    const isNight = kidTheme === "night";
+  chrome.storage.local.get(["kidTheme", "kidSpeech", "bedtimeCurfew", "bedtimeStart", "bedtimeEnd", "dailyBudget", "kidDailyUsage"]).then((s) => {
+    let isNight = s.kidTheme === "night";
+
+    // Bedtime check
+    if (s.bedtimeCurfew) {
+      const now = new Date();
+      const currentMin = now.getHours() * 60 + now.getMinutes();
+      const [sH, sM] = (s.bedtimeStart || "20:00").split(":").map(Number);
+      const [eH, eM] = (s.bedtimeEnd || "07:00").split(":").map(Number);
+      const startMin = (sH || 20) * 60 + (sM || 0);
+      const endMin = (eH || 7) * 60 + (eM || 0);
+      const inBedtime = startMin > endMin
+        ? (currentMin >= startMin || currentMin < endMin)
+        : (currentMin >= startMin && currentMin < endMin);
+      if (inBedtime) isNight = true;
+    }
+
     if (isNight) {
       wrap.classList.add("theme-night");
       wrap.querySelector("#kidTitle").textContent = "Good night video! 🌙";
-      wrap.querySelector("#kidDone").textContent = "All done for today!";
+      wrap.querySelector("#kidDone").textContent = "Time to sleep!";
       wrap.querySelector("#closingCap").textContent = "Closing the browser. Sweet dreams!";
     }
+
+    const budget = Number(s.dailyBudget) || 0;
+    const todayStr = new Date().toLocaleDateString("en-CA");
+    const used = (s.kidDailyUsage && s.kidDailyUsage[todayStr]) || 0;
+    if (budget > 0 && used >= budget) {
+      wrap.querySelector("#kidTitle").textContent = "Daily Goal Reached! ⭐";
+      wrap.querySelector("#kidDone").textContent = "All done for today!";
+    }
+
     const pool = isNight ? NIGHT_IDEAS : DAY_IDEAS;
     const idea = pool[Math.floor(Math.random() * pool.length)];
     wrap.querySelector(".emoji").textContent = idea[0];
     wrap.querySelector(".idea-text").textContent = idea[1];
 
     // Friendly offline speech synthesis
-    if (kidSpeech !== false && "speechSynthesis" in window) {
+    if (s.kidSpeech !== false && "speechSynthesis" in window) {
       try {
-        const text = isNight ? "Good night video! Time for sleep! Sweet dreams." : "Bye-bye video! All done! Great job!";
+        let text = isNight ? "Good night video! Time for sleep! Sweet dreams." : "Bye-bye video! All done! Great job!";
+        if (budget > 0 && used >= budget) {
+          text = "Daily video allowance reached! All done for today. Fantastic job!";
+        }
         const u = new SpeechSynthesisUtterance(text);
         u.rate = 0.95;
         u.pitch = 1.15;

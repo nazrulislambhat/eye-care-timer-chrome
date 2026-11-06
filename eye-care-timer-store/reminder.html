@@ -35,6 +35,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .badge {
       display: inline-flex;
@@ -199,6 +206,71 @@
     }
     .blink-counter { font-size: 22px; font-weight: 700; color: #a7f3d0; margin-top: 10px; }
 
+    /* Mode 5: Desk & Posture Macro Reset */
+    .macro-card {
+      background: rgba(13, 40, 34, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 16px 20px;
+      width: 100%;
+      max-width: 360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+    .macro-step-badge {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(52, 211, 153, 0.15);
+      padding: 3px 10px;
+      border-radius: 999px;
+    }
+    .macro-icon { font-size: 34px; margin: 2px 0; }
+    .macro-title { font-size: 17px; font-weight: 750; color: #a7f3d0; margin: 0; }
+    .macro-desc { font-size: 13px; color: #cbd5e1; line-height: 1.4; min-height: 38px; margin: 0; text-align: center; }
+    .macro-timer-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin: 2px 0 6px;
+    }
+    .macro-timer-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      transition: width 0.2s linear;
+    }
+    .macro-controls {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: center;
+    }
+    .macro-btn {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--ink);
+      cursor: pointer;
+      transition: all .15s ease;
+    }
+    .macro-btn.active {
+      background: var(--accent);
+      color: #061412;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
     /* Tips Grid */
     .tips {
       display: grid;
@@ -287,9 +359,14 @@
 <body>
   <div class="top-bar">
     <div class="badge">👀 Eye Care Mode</div>
-    <button id="ambientToggle" class="ambient-btn" type="button" aria-pressed="false">
-      <span id="ambientIcon">🌊</span> <span id="ambientLabel">Ambient Sound</span>
-    </button>
+    <div class="top-actions">
+      <button id="voiceToggle" class="ambient-btn" type="button" aria-pressed="false">
+        <span id="voiceIcon">🗣️</span> <span id="voiceLabel">Voice Coach: Off</span>
+      </button>
+      <button id="ambientToggle" class="ambient-btn" type="button" aria-pressed="false">
+        <span id="ambientIcon">🌊</span> <span id="ambientLabel">Ambient Sound</span>
+      </button>
+    </div>
   </div>
 
   <main>
@@ -312,6 +389,7 @@
       <button class="mode-tab" data-mode="breathe" role="tab" aria-selected="false">🌬️ Breathing Orb</button>
       <button class="mode-tab" data-mode="infinity" role="tab" aria-selected="false">♾️ Infinity Track</button>
       <button class="mode-tab" data-mode="blink" role="tab" aria-selected="false">👁️ Blink Gym</button>
+      <button class="mode-tab" data-mode="macro" role="tab" aria-selected="false">🧘 Desk & Posture</button>
     </div>
 
     <!-- Pacer views -->
@@ -361,6 +439,22 @@
         </div>
         <div class="blink-counter" id="blinkPrompt">Blink softly...</div>
         <p class="pacer-sub">Replenish your natural tear film</p>
+      </div>
+
+      <!-- Mode 5: Desk & Posture Macro Reset -->
+      <div class="pacer-view" id="view-macro" role="tabpanel">
+        <div class="macro-card">
+          <div class="macro-step-badge" id="macroStepBadge">Step 1 of 4</div>
+          <div class="macro-icon" id="macroIcon">🧘</div>
+          <div class="macro-title" id="macroTitle">Neck & Trap Release</div>
+          <p class="macro-desc" id="macroDesc">Tilt head gently towards left shoulder, hold 5s, then switch right.</p>
+          <div class="macro-timer-bar"><div class="macro-timer-fill" id="macroTimerFill"></div></div>
+          <div class="macro-controls">
+            <button class="macro-btn" id="macroPrev" type="button">◀ Back</button>
+            <button class="macro-btn active" id="macroNext" type="button">Next Step ▶</button>
+          </div>
+        </div>
+        <p class="pacer-sub">Restore healthy spinal posture & circulation</p>
       </div>
     </div>
 

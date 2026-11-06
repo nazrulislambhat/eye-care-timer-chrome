@@ -60,6 +60,11 @@
         <button id="stop" class="btn-ctrl" hidden>Stop</button>
         <button id="breakNow" class="btn-ctrl accent-subtle">Take Break</button>
       </div>
+      <div id="timerShields" class="shield-tags"></div>
+      <div id="kidBudgetBar" class="budget-container" hidden>
+        <div class="budget-meta"><span>Kid Screen Time Today</span><strong id="kidBudgetLabel">0 / 45m</strong></div>
+        <div class="budget-track"><div class="budget-fill" id="kidBudgetFill"></div></div>
+      </div>
     </section>
 
     <section class="section-card">
@@ -116,6 +121,15 @@
         </div>
         <button class="small-action-btn" data-ex="blink">Start</button>
       </div>
+
+      <div class="exercise-item">
+        <div class="ex-icon">🧘</div>
+        <div class="ex-info">
+          <h3>Desk & Posture Reset</h3>
+          <p>Neck, shoulder rolls, wrist flex & hydration.</p>
+        </div>
+        <button class="small-action-btn" data-ex="macro">Start</button>
+      </div>
     </div>
     <div class="tip-banner">
       💡 <strong>Pro-tip:</strong> Performing eye exercises twice a day reduces digital eye strain by up to 70%.
@@ -124,6 +138,19 @@
 
   <!-- TAB 3: INSIGHTS & ANALYTICS -->
   <div id="tab-insights" class="tab-content gated" hidden>
+    <div class="score-card">
+      <div class="score-main">
+        <div class="score-circle">
+          <span id="scoreVal">100</span>
+          <small>/100</small>
+        </div>
+        <div class="score-info">
+          <h3 id="scoreTitle">Optimal Protection</h3>
+          <p id="scoreSub">Regular rest keeps eye strain and fatigue low.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="stats-grid">
       <div class="stat-box">
         <div class="stat-val" id="statToday">0</div>
@@ -150,10 +177,58 @@
       </div>
       <div class="bar-chart" id="barChart"></div>
     </section>
+
+    <div class="insights-actions">
+      <button id="exportData" class="ghost-btn" type="button">📥 Export (JSON)</button>
+      <button id="resetData" class="ghost-btn danger-hover" type="button">🗑️ Reset History</button>
+    </div>
   </div>
 
   <!-- TAB 4: SETTINGS -->
   <div id="tab-settings" class="tab-content gated" hidden>
+    <section class="section-card">
+      <h2>Ergonomics & Smart Focus</h2>
+      <div class="setting-row">
+        <span>Screen Warmer (Blue Light)</span>
+        <label class="switch"><input type="checkbox" id="blueLightFilter"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row" id="warmthRow">
+        <span>Tint Warmth</span>
+        <input type="range" id="blueLightWarmth" class="range-slider" min="15" max="60" step="5" value="35">
+      </div>
+      <div class="setting-row">
+        <span>Break Delivery</span>
+        <select id="breakDelivery" class="select-input">
+          <option value="fullscreen">Immersive Fullscreen</option>
+          <option value="banner">Gentle Floating HUD</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span>Meeting Shield (Calls & DND)</span>
+        <label class="switch"><input type="checkbox" id="meetingShield"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Smart Idle Auto-Pause</span>
+        <label class="switch"><input type="checkbox" id="idlePause"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Natural Break Reset</span>
+        <select id="idleResetMinutes" class="select-input">
+          <option value="10">After 10m away (Recommended)</option>
+          <option value="15">After 15m away</option>
+          <option value="0">Disabled</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span>Tiered Macro Rest</span>
+        <select id="macroInterval" class="select-input">
+          <option value="3">Every 3rd break (Posture & Stretch)</option>
+          <option value="4">Every 4th break</option>
+          <option value="0">Disabled (Micro only)</option>
+        </select>
+      </div>
+    </section>
+
     <section class="section-card">
       <h2>Sound & Breaks</h2>
       <div class="setting-row">
@@ -214,6 +289,33 @@
       <div class="setting-row">
         <span>Close browser after 10s</span>
         <label class="switch"><input type="checkbox" id="closeBrowser"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Gentle volume fade-out</span>
+        <label class="switch"><input type="checkbox" id="volumeFade"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row">
+        <span>Daily Screen Time Budget</span>
+        <select id="dailyBudget" class="select-input">
+          <option value="0">Unlimited (No daily cap)</option>
+          <option value="30">30 minutes / day</option>
+          <option value="45">45 minutes / day</option>
+          <option value="60">60 minutes / day</option>
+          <option value="90">90 minutes / day</option>
+          <option value="120">120 minutes / day</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <span>Bedtime Curfew Lock</span>
+        <label class="switch"><input type="checkbox" id="bedtimeCurfew"><span class="slider"></span></label>
+      </div>
+      <div class="setting-row" id="curfewHoursRow">
+        <span>Curfew Sleep Window</span>
+        <div style="display:flex;gap:4px;align-items:center;">
+          <input type="time" id="bedtimeStart" class="time-input" value="20:00">
+          <span style="font-size:11px;color:var(--muted)">to</span>
+          <input type="time" id="bedtimeEnd" class="time-input" value="07:00">
+        </div>
       </div>
 
       <div class="access-box">

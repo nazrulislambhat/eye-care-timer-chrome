@@ -23,6 +23,25 @@ async function load() {
   $("kidSpeech").checked = s.kidSpeech !== false;
   $("closeBrowser").checked = s.closeBrowser !== false;
 
+  // New Ergonomics & Focus Settings
+  $("blueLightFilter").checked = !!s.blueLightFilter;
+  $("blueLightWarmth").value = s.blueLightWarmth || 35;
+  $("breakDelivery").value = s.breakDelivery || "fullscreen";
+  $("meetingShield").checked = s.meetingShield !== false;
+  $("idlePause").checked = s.idlePause !== false;
+  $("idleResetMinutes").value = String(s.idleResetMinutes ?? 10);
+  $("macroInterval").value = String(s.macroInterval ?? 3);
+
+  // New Kid Mode Settings
+  $("volumeFade").checked = s.volumeFade !== false;
+  $("dailyBudget").value = String(s.dailyBudget ?? 0);
+  $("bedtimeCurfew").checked = !!s.bedtimeCurfew;
+  $("bedtimeStart").value = s.bedtimeStart || "20:00";
+  $("bedtimeEnd").value = s.bedtimeEnd || "07:00";
+
+  $("warmthRow").hidden = !$("blueLightFilter").checked;
+  $("curfewHoursRow").hidden = !$("bedtimeCurfew").checked;
+
   if (s.soundType) $("soundType").value = s.soundType;
   if (s.kidTheme) $("kidTheme").value = s.kidTheme;
 
@@ -35,6 +54,7 @@ async function load() {
   renderChips();
   setupTabs();
   setupExercises();
+  setupDataButtons();
   send({ type: "ack" }); // opening popup dismisses "!" badge
   refresh();
   setInterval(refresh, 500);
@@ -168,11 +188,55 @@ $("saveCustom").onclick = async () => {
 $("custom").addEventListener("keydown", (e) => { if (e.key === "Enter") $("startCustom").click(); });
 
 // Settings change listeners
-for (const k of ["repeat", "sound", "ambientSound", "prewarn", "notify", "pauseMedia", "resumeMedia", "kidMode", "kidSpeech", "closeBrowser"]) {
+for (const k of ["repeat", "sound", "ambientSound", "prewarn", "notify", "pauseMedia", "resumeMedia", "kidMode", "kidSpeech", "closeBrowser", "meetingShield", "idlePause", "volumeFade"]) {
   $(k).onchange = () => chrome.storage.local.set({ [k]: $(k).checked });
 }
 $("soundType").onchange = () => chrome.storage.local.set({ soundType: $("soundType").value });
 $("kidTheme").onchange = () => chrome.storage.local.set({ kidTheme: $("kidTheme").value });
+
+$("blueLightFilter").onchange = () => {
+  const on = $("blueLightFilter").checked;
+  $("warmthRow").hidden = !on;
+  chrome.storage.local.set({ blueLightFilter: on }).then(() => send({ type: "syncWarmer" }));
+};
+$("blueLightWarmth").oninput = () => {
+  chrome.storage.local.set({ blueLightWarmth: Number($("blueLightWarmth").value) });
+};
+$("breakDelivery").onchange = () => chrome.storage.local.set({ breakDelivery: $("breakDelivery").value });
+$("idleResetMinutes").onchange = () => chrome.storage.local.set({ idleResetMinutes: Number($("idleResetMinutes").value) });
+$("macroInterval").onchange = () => chrome.storage.local.set({ macroInterval: Number($("macroInterval").value) });
+$("dailyBudget").onchange = () => chrome.storage.local.set({ dailyBudget: Number($("dailyBudget").value) }).then(refresh);
+
+$("bedtimeCurfew").onchange = () => {
+  const on = $("bedtimeCurfew").checked;
+  $("curfewHoursRow").hidden = !on;
+  chrome.storage.local.set({ bedtimeCurfew: on }).then(refresh);
+};
+$("bedtimeStart").onchange = () => chrome.storage.local.set({ bedtimeStart: $("bedtimeStart").value });
+$("bedtimeEnd").onchange = () => chrome.storage.local.set({ bedtimeEnd: $("bedtimeEnd").value });
+
+function setupDataButtons() {
+  $("exportData").onclick = async () => {
+    const res = await send({ type: "exportStats" });
+    if (res && res.data) {
+      const blob = new Blob([JSON.stringify(res.data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `eyecare-stats-${new Date().toLocaleDateString("en-CA")}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  $("resetData").onclick = async () => {
+    if (confirm("Reset all break statistics and daily screen time history?")) {
+      await send({ type: "resetStats" });
+      renderInsights();
+      refresh();
+    }
+  };
+}
 
 $("stop").onclick = () => send({ type: "stop" }).then(refresh);
 $("pause").onclick = () => send({ type: $("pause").dataset.mode === "resume" ? "resume" : "pause" }).then(refresh);
@@ -210,6 +274,29 @@ async function renderInsights() {
   const totalAttempts = todayBreaks + todaySnoozes;
   const compliance = totalAttempts > 0 ? Math.round((todayBreaks / totalAttempts) * 100) : 100;
   $("statCompliance").textContent = compliance + "%";
+
+  // Eye Health Score
+  const breakPoints = Math.min(60, todayBreaks * 12);
+  const compPoints = Math.round(20 * (compliance / 100));
+  const streakPoints = Math.min(20, currentStreak * 4);
+  const score = todayBreaks > 0
+    ? Math.min(100, breakPoints + compPoints + streakPoints)
+    : Math.min(100, Math.max(45, streakPoints + compPoints));
+
+  $("scoreVal").textContent = score;
+  if (score >= 85) {
+    $("scoreTitle").textContent = "Optimal Protection 🌟";
+    $("scoreSub").textContent = "Superb break cadence and visual recovery.";
+    $("scoreVal").style.color = "var(--accent)";
+  } else if (score >= 65) {
+    $("scoreTitle").textContent = "Good Habit Building 👍";
+    $("scoreSub").textContent = "Keep resting your eyes every 20 minutes.";
+    $("scoreVal").style.color = "var(--warn)";
+  } else {
+    $("scoreTitle").textContent = "Eye Rest Needed ⚠️";
+    $("scoreSub").textContent = "Take more breaks to relieve digital fatigue.";
+    $("scoreVal").style.color = "var(--urgent)";
+  }
 
   // Build 7-day chart
   const chartBox = $("barChart");
@@ -287,6 +374,49 @@ async function refresh() {
 
   arc.setAttribute("class", "arc " + (["warn", "urgent", "paused"].includes(o.state) ? o.state : ""));
   arc.style.strokeDashoffset = String(CIRC * (o.state === "idle" ? 1 : o.progress));
+
+  // Shield Tags & Kid Budget in Timer view
+  const shieldsBox = $("timerShields");
+  shieldsBox.innerHTML = "";
+  if (s.blueLightFilter) {
+    const t = document.createElement("span");
+    t.className = "shield-tag";
+    t.textContent = "☀️ Warmer Tint";
+    shieldsBox.appendChild(t);
+  }
+  if (s.meetingShield !== false) {
+    const t = document.createElement("span");
+    t.className = "shield-tag";
+    t.textContent = "🛡️ Meeting Shield";
+    shieldsBox.appendChild(t);
+  }
+  if (s.idlePause !== false) {
+    const t = document.createElement("span");
+    t.className = "shield-tag";
+    t.textContent = "💤 Smart Idle";
+    shieldsBox.appendChild(t);
+  }
+  if (s.bedtimeCurfew) {
+    const t = document.createElement("span");
+    t.className = "shield-tag warn";
+    t.textContent = `🌙 Curfew ${s.bedtimeStart || "20:00"}`;
+    shieldsBox.appendChild(t);
+  }
+
+  // Kid budget bar
+  const budgetBox = $("kidBudgetBar");
+  const budgetMin = Number(s.dailyBudget) || 0;
+  if (s.kidMode !== false && budgetMin > 0) {
+    budgetBox.hidden = false;
+    const usage = (s.kidDailyUsage && s.kidDailyUsage[new Date().toLocaleDateString("en-CA")]) || 0;
+    $("kidBudgetLabel").textContent = `${usage} / ${budgetMin}m`;
+    const pct = Math.min(100, Math.round((usage / budgetMin) * 100));
+    const fill = $("kidBudgetFill");
+    fill.style.width = pct + "%";
+    fill.classList.toggle("exceeded", usage >= budgetMin);
+  } else {
+    budgetBox.hidden = true;
+  }
 
   // Toolbar icon sync
   const sec = Math.floor(now / 1000);
