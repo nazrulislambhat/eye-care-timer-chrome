@@ -28,8 +28,6 @@ async function load() {
   $("blueLightWarmth").value = s.blueLightWarmth || 35;
   $("breakDelivery").value = s.breakDelivery || "fullscreen";
   $("meetingShield").checked = s.meetingShield !== false;
-  $("idlePause").checked = s.idlePause !== false;
-  $("idleResetMinutes").value = String(s.idleResetMinutes ?? 10);
   $("macroInterval").value = String(s.macroInterval ?? 3);
 
   // New Kid Mode Settings
@@ -188,7 +186,7 @@ $("saveCustom").onclick = async () => {
 $("custom").addEventListener("keydown", (e) => { if (e.key === "Enter") $("startCustom").click(); });
 
 // Settings change listeners
-for (const k of ["repeat", "sound", "ambientSound", "prewarn", "notify", "pauseMedia", "resumeMedia", "kidMode", "kidSpeech", "closeBrowser", "meetingShield", "idlePause", "volumeFade"]) {
+for (const k of ["repeat", "sound", "ambientSound", "prewarn", "notify", "pauseMedia", "resumeMedia", "kidMode", "kidSpeech", "closeBrowser", "meetingShield", "volumeFade"]) {
   $(k).onchange = () => chrome.storage.local.set({ [k]: $(k).checked });
 }
 $("soundType").onchange = () => chrome.storage.local.set({ soundType: $("soundType").value });
@@ -203,7 +201,6 @@ $("blueLightWarmth").oninput = () => {
   chrome.storage.local.set({ blueLightWarmth: Number($("blueLightWarmth").value) });
 };
 $("breakDelivery").onchange = () => chrome.storage.local.set({ breakDelivery: $("breakDelivery").value });
-$("idleResetMinutes").onchange = () => chrome.storage.local.set({ idleResetMinutes: Number($("idleResetMinutes").value) });
 $("macroInterval").onchange = () => chrome.storage.local.set({ macroInterval: Number($("macroInterval").value) });
 $("dailyBudget").onchange = () => chrome.storage.local.set({ dailyBudget: Number($("dailyBudget").value) }).then(refresh);
 
@@ -388,12 +385,6 @@ async function refresh() {
     const t = document.createElement("span");
     t.className = "shield-tag";
     t.textContent = "🛡️ Meeting Shield";
-    shieldsBox.appendChild(t);
-  }
-  if (s.idlePause !== false) {
-    const t = document.createElement("span");
-    t.className = "shield-tag";
-    t.textContent = "💤 Smart Idle";
     shieldsBox.appendChild(t);
   }
   if (s.bedtimeCurfew) {

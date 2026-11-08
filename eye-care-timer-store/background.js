@@ -7,7 +7,6 @@ const TICK = "eyeTick";
 const PREWARN = "eyePrewarn";
 const EXTEND_MINUTES = 10;
 const CLOSE_SECONDS = 10;
-const IDLE_DETECTION_SECONDS = 60;
 let closeTimer = null;
 
 const MESSAGES = [
@@ -360,7 +359,7 @@ async function startTimer(minutes, opts = {}) {
     await chrome.alarms.create(PREWARN, { when: endTime - 2 * 60 * 1000 });
   }
 
-  const data = { endTime, duration, paused: false, idlePaused: false, idleStartedAt: 0 };
+  const data = { endTime, duration, paused: false };
   if (opts.repeat !== undefined) data.repeat = !!opts.repeat;
   if (!opts.snooze) data.cycle = minutes;      // snooze must not change the repeat cycle
   if (!opts.keepRinging) { data.ringing = false; data.locked = false; data.closeAt = 0; }
@@ -374,7 +373,7 @@ async function stopTimer() {
   await chrome.alarms.clear(ALARM);
   await chrome.alarms.clear(PREWARN);
   await chrome.alarms.clear(TICK);
-  await set({ paused: false, ringing: false, locked: false, closeAt: 0, idlePaused: false, idleStartedAt: 0 });
+  await set({ paused: false, ringing: false, locked: false, closeAt: 0 });
   await chrome.storage.local.remove(["endTime", "duration", "pausedLeft"]);
   await restoreMediaVolume();
   await refreshUI();
@@ -401,7 +400,7 @@ async function resumeTimer() {
   if (pausedLeft > 120000) {
     await chrome.alarms.create(PREWARN, { when: endTime - 2 * 60 * 1000 });
   }
-  await set({ endTime, paused: false, idlePaused: false, idleStartedAt: 0 });
+  await set({ endTime, paused: false });
   await chrome.storage.local.remove("pausedLeft");
   await refreshUI();
 }
@@ -565,56 +564,6 @@ async function onTimerDone(opts = {}) {
   blinkIcon();
   refreshUI();
 }
-
-// ---------- Smart Idle & Auto-Pause / Auto-Reset ----------
-try {
-  chrome.idle.setDetectionInterval(IDLE_DETECTION_SECONDS);
-  chrome.idle.onStateChanged.addListener(async (newState) => {
-    const s = await get(["idlePause", "idleResetMinutes", "endTime", "paused", "cycle", "idleStartedAt", "idlePaused"]);
-    if (s.idlePause === false) return;
-
-    if (newState === "idle" || newState === "locked") {
-      // User stepped away or locked screen
-      if (s.endTime && !s.paused) {
-        const pausedLeft = Math.max(1000, s.endTime - Date.now());
-        await chrome.alarms.clear(ALARM);
-        await chrome.alarms.clear(PREWARN);
-        await set({
-          paused: true,
-          pausedLeft,
-          idlePaused: true,
-          idleStartedAt: Date.now()
-        });
-        await chrome.storage.local.remove("endTime");
-        await refreshUI();
-      }
-    } else if (newState === "active") {
-      // User returned
-      if (s.idlePaused) {
-        const awayTime = s.idleStartedAt ? Date.now() - s.idleStartedAt : 0;
-        const resetThreshold = (s.idleResetMinutes ?? 10) * 60 * 1000;
-
-        if (resetThreshold > 0 && awayTime >= resetThreshold) {
-          // User took a natural break away from the screen!
-          await recordBreak();
-          await set({ idlePaused: false, idleStartedAt: 0 });
-          chrome.notifications.create("idleReset", {
-            type: "basic",
-            iconUrl: "icons/icon128.png",
-            title: "Welcome back! 🌿",
-            message: "You were away for " + Math.round(awayTime / 60000) + " minutes (natural eye break). Timer refreshed!",
-            priority: 1
-          });
-          await startTimer(s.cycle || 20, { parentBypass: true });
-        } else {
-          // Short absence: resume where paused
-          await set({ idlePaused: false, idleStartedAt: 0 });
-          await resumeTimer();
-        }
-      }
-    }
-  });
-} catch (e) {}
 
 // ---------- events ----------
 chrome.alarms.onAlarm.addListener((alarm) => {

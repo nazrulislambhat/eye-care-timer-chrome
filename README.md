@@ -14,7 +14,6 @@ When the timer reaches zero, it can show a friendly **"Bye-bye video! All done!"
 **Smart Timer & Ergonomics**
 - Tabbed interface: **Timer**, **Exercises**, **Insights**, and **Settings**
 - Quick-start presets (15, 20 and 30 minutes) plus custom saved presets
-- **Smart Idle & Auto-Pause (`chrome.idle`)**: pauses when you leave your desk; auto-resets after a 10-minute natural break away from the screen
 - **Meeting & Presentation Shield**: detects active calls on Google Meet, Zoom, Teams, Webex and defers breaks by 5 minutes without disrupting you
 - **Break Delivery Options**: choose between **Immersive Fullscreen** or an unobtrusive **Gentle Floating HUD** banner
 - **Screen Warmer (Blue Light Tint)**: injects customizable warm amber tint directly in tabs to relieve evening eye strain
@@ -91,8 +90,6 @@ Switch between 5 scientifically backed recovery routines in the **Exercises** ta
 - **🗣️ Voice Coach**: Spoken cues via the Web Speech API can guide you hands-free through each exercise.
 
 ### 🛡️ Smart Focus & Ergonomics Settings
-- **Smart Idle Auto-Pause (`chrome.idle`)**: The timer pauses automatically when you lock your screen or walk away from your desk.
-- **Natural Break Auto-Reset**: When enabled, spending $\ge 10$ minutes away from your screen is automatically recognized as a completed natural break, refreshing the timer cycle for your return.
 - **Meeting & Presentation Shield**: Detects active video calls and screen shares on Google Meet, Zoom, Microsoft Teams, Webex, and others, postponing eye breaks by 5 minutes to prevent awkward interruptions.
 - **Break Delivery**: Toggle between **Immersive Fullscreen** (deep visual disconnect) and **Gentle Floating HUD** (unobtrusive 20s pill at top of screen that never steals typing focus).
 - **Screen Warmer (Blue Light Filter)**: Injects an amber color tint with adjustable warmth (15% to 60%) to relieve late-night digital eye strain.
@@ -123,7 +120,6 @@ Switch between 5 scientifically backed recovery routines in the **Exercises** ta
 | `alarms` | Runs the countdown so it fires while the browser is minimized |
 | `storage` | Saves settings, timer state, presets, PIN hash, and analytics locally |
 | `notifications` | Shows a desktop notification when the timer ends or pre-warns |
-| `idle` | Detects when you step away from the desk to auto-pause and auto-reset the timer |
 | `scripting` | Used to pause media, apply the Screen Warmer tint, and display break HUDs over open tabs |
 | `optional_host_permissions` (`<all_urls>`) | Not requested at install. Requested only when you click **Allow access to all sites** on the Full protection page |
 
@@ -135,7 +131,7 @@ Nothing leaves your device. The extension makes no network requests and uses no 
 
 ```
 manifest.json      Extension manifest (MV3)
-background.js      Service worker: timer, idle detection, alarms, PIN checks, lock/close logic, media control
+background.js      Service worker: timer, alarms, PIN checks, lock/close logic, media control
 icon.js            Draws the live toolbar icon (OffscreenCanvas)
 popup.html/css/js  Popup UI, PIN lock, analytics, and settings
 pinpad.js          Shared 4-digit keypad
